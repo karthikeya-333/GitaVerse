@@ -2,6 +2,7 @@ package com.BG.gitaverse;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class DailyEmailScheduler {
         this.shlokaService = shlokaService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Kolkata")
     public void sendDailyEmail() {
 
         List<User> users = userRepository.findAll();
@@ -77,14 +78,20 @@ public class DailyEmailScheduler {
         int ch = user.getCurrentChapter();
         int v = user.getCurrentVerse();
 
-        int versesInChapter = 50;
+        int maxVerses = ChapterInfo.VERSES[ch];
 
-        if (v < versesInChapter) {
-            user.setCurrentVerse(v + 1);
-        } else {
-            user.setCurrentChapter(ch + 1);
+        if(ch==18 && v==maxVerses){
+            user.setCurrentChapter(1);
             user.setCurrentVerse(1);
         }
+        else if(v==maxVerses){
+            user.setCurrentChapter(ch+1);
+            user.setCurrentVerse(1);
+        }
+        else{
+            user.setCurrentVerse(v+1);
+        }
+
     }
 
 }

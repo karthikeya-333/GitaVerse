@@ -6,6 +6,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import static reactor.netty.http.HttpConnectionLiveness.log;
+
 @Service
 public class EmailService {
 
@@ -26,7 +28,7 @@ public class EmailService {
             helper.setText(htmlContent, true); // true = HTML
 
             mailSender.send(mimeMessage);
-            System.out.println("Email sent successfully to " + to);
+            log.info("Email sent successfully to " + to);
 
         } catch (Exception e) {
             e.printStackTrace();
