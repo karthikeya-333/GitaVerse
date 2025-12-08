@@ -24,20 +24,25 @@ public class ShlokaService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         try {
-            File fileEnglish = new File("src/main/resources/geeta_english.json");
-            File fileTelugu = new File("src/main/resources/geeta_telugu.json");
+            ClassLoader classLoader = getClass().getClassLoader();
 
-            EnglishShloka[] data = mapper.readValue(fileEnglish, EnglishShloka[].class);
+            EnglishShloka[] data = mapper.readValue(
+                    classLoader.getResourceAsStream("geeta_english.json"),
+                    EnglishShloka[].class
+            );
             englishShlokaList = Arrays.asList(data);
 
-            TeluguShloka[] teluguData = mapper.readValue(fileTelugu, TeluguShloka[].class);
+            TeluguShloka[] teluguData = mapper.readValue(
+                    classLoader.getResourceAsStream("geeta_telugu.json"),
+                    TeluguShloka[].class
+            );
             teluguShlokaList = Arrays.asList(teluguData);
 
-        } catch (IOException e) {
-            log.info("Exception occurred",e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
+
 
     public ShlokaDTO getShloka(int chapter, int verse) {
 
