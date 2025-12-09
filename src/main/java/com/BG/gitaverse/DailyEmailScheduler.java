@@ -21,7 +21,6 @@ public class DailyEmailScheduler {
         this.shlokaService = shlokaService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
     public void sendDailyEmail() {
 
         List<User> users = userRepository.findAll();
