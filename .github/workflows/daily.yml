@@ -2,7 +2,7 @@ name: Daily Email Sender
 
 on:
   schedule:
-    - cron: "30 3 * * *"   # Runs 9 AM IST (03:30 UTC)
+    - cron: "30 3 * * *"   # 9 AM IST
   workflow_dispatch:
 
 jobs:
@@ -23,15 +23,23 @@ jobs:
 
       - name: Run Daily Job
         env:
+          # Mail
           SPRING_MAIL_HOST: smtp.gmail.com
           SPRING_MAIL_PORT: 587
           SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
           SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
 
+          # DB
           SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-          SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+          # JPA
+          SPRING_JPA_HIBERNATE_DDL_AUTO: update
+          SPRING_JPA_SHOW_SQL: false
+          SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+          SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
 
         run: |
           ./mvnw -q -DskipTests package
