@@ -21,7 +21,7 @@ public class DailyEmailScheduler {
         this.shlokaService = shlokaService;
     }
 
-    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Kolkata")
+    @EventListener(ApplicationReadyEvent.class)
     public void sendDailyEmail() {
 
         List<User> users = userRepository.findAll();
