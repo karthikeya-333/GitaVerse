@@ -1,43 +1,38 @@
-name: Daily Gita Email
+name: Daily Email Sender
 
 on:
-  workflow_dispatch:    # manual trigger
   schedule:
-    - cron: "30 3 * * *"   # 9:00 AM IST (03:30 UTC)
+    - cron: "30 3 * * *"   # Runs 9 AM IST (03:30 UTC)
+  workflow_dispatch:
 
 jobs:
-  run-daily-email:
+  send-daily-email:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          distribution: "temurin"
+          java-version: "21"
 
-      - name: Export env variables
+      - name: Grant mvnw permission
+        run: chmod +x mvnw
+
+      - name: Run Daily Job
+        env:
+          SPRING_MAIL_HOST: smtp.gmail.com
+          SPRING_MAIL_PORT: 587
+          SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
+          SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
+
+          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+          SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+
         run: |
-          echo "SPRING_MAIL_HOST=${{ secrets.SPRING_MAIL_HOST }}" >> $GITHUB_ENV
-          echo "SPRING_MAIL_PORT=${{ secrets.SPRING_MAIL_PORT }}" >> $GITHUB_ENV
-          echo "SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}" >> $GITHUB_ENV
-
-          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> $GITHUB_ENV
-          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> $GITHUB_ENV
-          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
-          echo "SPRING_DATASOURCE_DRIVER_CLASS_NAME=${{ secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME }}" >> $GITHUB_ENV
-
-          echo "SPRING_JPA_HIBERNATE_DDL_AUTO=${{ secrets.SPRING_JPA_HIBERNATE_DDL_AUTO }}" >> $GITHUB_ENV
-          echo "SPRING_JPA_SHOW_SQL=${{ secrets.SPRING_JPA_SHOW_SQL }}" >> $GITHUB_ENV
-          echo "SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=${{ secrets.SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL }}" >> $GITHUB_ENV
-          echo "SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${{ secrets.SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT }}" >> $GITHUB_ENV
-
-      - name: Build project
-        run: mvn -q -DskipTests clean package
-
-      - name: Run email sender
-        run: java -jar target/*.jar
+          ./mvnw -q -DskipTests package
+          java -jar target/*.jar
