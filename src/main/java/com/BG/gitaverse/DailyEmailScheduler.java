@@ -77,7 +77,7 @@ public class DailyEmailScheduler {
         int ch = user.getCurrentChapter();
         int v = user.getCurrentVerse();
 
-        int maxVerses = ChapterInfo.VERSES[ch];
+        int maxVerses = ChapterInfo.VERSES[ch-1];
 
         if(ch==18 && v==maxVerses){
             user.setCurrentChapter(1);
